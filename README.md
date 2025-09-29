@@ -10,4 +10,4 @@ The circuit boards inside the HMI are purchased from your typical boardhouse.
 
 ## Motivation
 
-DIN rails are cool.
+DIN rails are cool.  We needed a heater control panel.
