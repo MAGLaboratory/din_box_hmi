@@ -13,5 +13,6 @@
 void IIC_Init(u32 bound, u16 address);
 void APP_GPIO_Init(void);
 void TIME_Init(void);
+void UART_Init(void);
 
 #endif /* USER_INIT_H_ */

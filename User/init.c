@@ -46,6 +46,47 @@ void IIC_Init(u32 bound, u16 address)
 }
 
 /*********************************************************************
+ * @fn      UART_Init
+ *
+ * @brief   Initializes the UART peripheral
+ *
+ * @return  none
+ */
+void UART_Init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
+	USART_InitTypeDef USART_InitStructure = { 0 };
+
+	RCC_APB2PeriphClockCmd(
+		RCC_APB2Periph_USART1 |
+		RCC_APB2Periph_GPIOD |
+		RCC_APB2Periph_AFIO, ENABLE);
+
+	// pin 1 with PD6 is used as the UART half-duplex pin
+	// this pin is high by default.
+	GPIOD->BSHR = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	GPIO_PinRemapConfig(GPIO_PartialRemap2_USART1, ENABLE);
+
+	USART_InitStructure.USART_BaudRate = 38400;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl 
+			= USART_HardwareFloatControl_No;
+	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+
+	USART_Init(USART1, &USART_InitStructure);
+	USART_Cmd(USART1, ENABLE);
+
+	USART_HalfDuplexCmd(USART1, ENABLE);
+}
+
+/*********************************************************************
  * @fn      APP_GPIO_Init
  *
  * @brief   Initializes GPIOs (buttons) for the application
@@ -55,34 +96,45 @@ void IIC_Init(u32 bound, u16 address)
 void APP_GPIO_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOD, ENABLE);
+	RCC_APB2PeriphClockCmd(
+			RCC_APB2Periph_GPIOA |
+			RCC_APB2Periph_GPIOC , ENABLE);
 
-	// PA1 (minutes)
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	// Pin 1 is handled by the UART function
+	
+	// Pin 2 is the VSS pin
 
-	// PA2 (hours)
+	// Pin 3: DIR (PA2)
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	// PD6 just in case (pin shared with PA1)
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	// Pin 4 is the VDD pin
+	//
+	// Pin 5 is handled by the I2C function
+	//
+	// Pin 6 is handled by the I2C function
+	//
+	// Pin 7: OUT (PC4)
+	// TODO: PWM?
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 
 /*********************************************************************
  * @fn      TIME_Init
  *
- * @brief   Initializes the timer for the 32,768Hz clock.
+ * @brief   Initializes the timer for the 4 kHz system clock.
  *
- * This funciton initializes the timer for the 32,768Hz clock.
- * It uses the T1 edge detector for both rising and falling edges so
- * the timer actually increments at a rate of 65,536Hz.
- * This is divided by the period configured as 256 to create a system
- * tick on t1_count that increments at 256Hz.
+ * The system clock should be 4 kHz in order to satisfy the minimum 250 us
+ * common denominator from T_1.5 and T_3.5 on modbus.
+ * {system clock} / {desired fcy} = {scaler}
+ * 24e6 / 4e3 = 6 000
+ * {prescaler} * {period} = {scale}
+ * 60 * 100 / 6 000
  *
  * @return  none
  */
@@ -91,33 +143,21 @@ void TIME_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 
-	// configure clock tree
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | RCC_APB2Periph_GPIOC, ENABLE);
-
-	// configure timer input
-	GPIO_PinRemapConfig(GPIO_FullRemap_TIM1, ENABLE);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init( GPIOC, &GPIO_InitStructure);
 
 	TIM_DeInit(TIM1);
 
 	// configure timebase
-	TIM_TimeBaseInitStructure.TIM_ClockDivision = 0U;
+	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInitStructure.TIM_Period = (1U << 8U) - 1U; // resets after this numbers
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 0U;
+	TIM_TimeBaseInitStructure.TIM_Period = 100U - 1U;
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 60U - 1U;
 	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0U;
 	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseInitStructure);
 
-	// Auto Reload Register Shadow Register
-	//TIM_ARRPreloadConfig(TIM1, ENABLE);
-
-	// configure clock source
-	TIM_TIxExternalClockConfig(TIM1, TIM_TIxExternalCLK1Source_TI1ED,
-			TIM_ICPolarity_BothEdge, 0x0);
+	TIM_ARRPreloadConfig(TIM1, ENABLE);
+	TIM_InternalClockConfig(TIM1);
+	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);
 
 	// configure interrupts
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);

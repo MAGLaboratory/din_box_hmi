@@ -45,35 +45,7 @@ void HardFault_Handler(void)
 
 void TIM1_UP_IRQHandler(void)
 {
-	uint32_t shift = 0x80000000U;
-	uint32_t mask = shift - 1U;
-	uint16_t reload = (1U << 8U) - 1U;
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
-    while (shift > 1U)
-    {
-    	mask = shift - 1U;
-    	if (SEC_MASK & shift)
-    	{
-    		// perform the operation once per "shift" cycle
-    		// the easiest way to do this is to mask it and compare it with the mask value
-    		// it is also possible to compare this with 0
-    		if ((t1_count & mask) == mask)
-    		{
-    			// adding to the reload register makes the period longer and
-    			// therefore makes the clock slower
-    			if (SEC_ADD)
-    			{
-    				reload += 1U;
-    			}
-    			else
-    			{
-    				reload -= 1U;
-				}
-    		}
-    	}
-    	shift >>= 1U;
-    }
-    TIM_SetAutoreload(TIM1, reload);
     t1_count += 1U;
 }
 

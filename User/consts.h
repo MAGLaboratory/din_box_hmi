@@ -19,3 +19,12 @@
 // input data
 #define C_CH455_ADDR_I (0x4F)
 #define C_CH455_I_KP (0x40)
+#define C_CH455_I_UP  (0x1C)
+#define C_CH455_I_LFT (0x36)
+#define C_CH455_I_ENT (0x24)
+#define C_CH455_I_RHT (0X16)
+#define C_CH455_I_DWN (0x26)
+#define C_CH455_I_BAK (0x1E)
+
+// loop constants
+#define C_SLOWER_CYCLE (4U)
