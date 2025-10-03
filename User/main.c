@@ -60,7 +60,7 @@ const u8 char_lut[] __attribute__((section(".text.consts")))=
 /* Global variables */
 volatile u32 t1_count = 0;
 u32 last_t1_count = 0;
-u8 loop_overrud = 0;
+u8 loop_overrun = 0;
 
 /*********************************************************************
  * @fn      IIC_TX
@@ -145,7 +145,7 @@ void IIC_RX(u8 addr, u8 *data)
 	}
 	I2C_Send7bitAddress( I2C1, addr, I2C_Direction_Receiver);
 
-	while (!I2C_CheckEvent (I2C1, I2C_EVENT_RECEIVER_MODE_SELECTED))
+	while (!I2C_CheckEvent (I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
 	{
 		if (t1_count - start_time > 1U)
 		{
@@ -234,17 +234,16 @@ int main(void)
 
 	UART_Init();
 
-	//printf("IIC Host mode\r\n");
-	IIC_Init(40000, C_CH422_SP_ADDR);
-
-	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
-
 	// start time
 	TIM_Cmd(TIM1, ENABLE);
+	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
+
+	//printf("IIC Host mode\r\n");
+	IIC_Init(40000, C_CH455_ADDR_SP);
+
+	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)
 	{
-		u8 disp_sec = 0;
-
 		// main loop timer overflow
 		if (t1_count - last_t1_count != 0U)
 		{
@@ -257,7 +256,7 @@ int main(void)
 			__WFI();
 		}
 
-		if (t1_count & (C_SLOWER_CYCLE - 1U) == (C_SLOWER_CYCLE - 1U))
+		if ((t1_count & (C_SLOWER_CYCLE - 1U)) == (C_SLOWER_CYCLE - 1U))
 		{
 			IIC_RX(C_CH455_ADDR_I, &i);
 			if (i & C_CH455_I_KP)
@@ -270,9 +269,9 @@ int main(void)
 			}
 			else
 			{
-				for (i = 0, i < 4u, i++)
+				for (i = 0; i < 4u; i++)
 				{
-					write_digit(i, 0);
+					write_digit(i, 0 | 0b1000000);
 				}
 			}
 		}

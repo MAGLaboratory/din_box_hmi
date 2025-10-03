@@ -23,11 +23,13 @@ void IIC_Init(u32 bound, u16 address)
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
 	RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, ENABLE);
 
+	GPIOC->BSHR = GPIO_Pin_2;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init( GPIOC, &GPIO_InitStructure);
 
+	GPIOC->BSHR = GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -77,7 +79,7 @@ void UART_Init(void)
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No;
 	USART_InitStructure.USART_HardwareFlowControl 
-			= USART_HardwareFloatControl_No;
+			= USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
 	USART_Init(USART1, &USART_InitStructure);
@@ -140,7 +142,6 @@ void APP_GPIO_Init(void)
  */
 void TIME_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
