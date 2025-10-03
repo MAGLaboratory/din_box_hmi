@@ -8,7 +8,7 @@
 #define C_CH455_SP_SLEEP (2u)
 #define C_CH455_SP_ENA (0u)
 
-#define C_MY_CH455_SP (1 << C_CH455_SP_ENA)
+#define C_MY_CH455_SP ((2u << C_CH455_SP_INTENS) | (1 << C_CH455_SP_ENA))
 
 // output data
 #define C_CH455_ADDR_W_IO0 (0x68)

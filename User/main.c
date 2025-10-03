@@ -225,7 +225,7 @@ void write_digit(u8 digit, u8 chd)
  */
 int main(void)
 {
-	u8 i = 0;
+	u16 reg = 500;
 	SystemCoreClockUpdate();
 
 	APP_GPIO_Init();
@@ -258,28 +258,55 @@ int main(void)
 
 		if ((t1_count & (C_SLOWER_CYCLE - 1U)) == (C_SLOWER_CYCLE - 1U))
 		{
-			IIC_RX(C_CH455_ADDR_I, &i);
-			if (i & C_CH455_I_KP)
+			u8 r = 0;
+			u8 rf = 0;
+			static u8 last_r = 0;
+			u16 tmp = reg;
+			IIC_RX(C_CH455_ADDR_I, &r);
+			rf = r & ~C_CH455_I_KP;
+			if (last_r != r && r & C_CH455_I_KP)
 			{
-				write_digit(0, char_lut_fun(0));
-				write_digit(1, 0b01110110);
-				write_digit(2, char_lut_fun(i >> 4U));
-				write_digit(3, char_lut_fun(i & 0xF));
-				
-			}
-			else
-			{
-				for (i = 0; i < 4u; i++)
-				{
-					if ((t1_count >> 12 & 3u) == i)
+				if (rf == C_CH455_I_UP)
+				{ 
+					tmp += 1u;
+					if (tmp > 9999u || reg > tmp)
 					{
-						write_digit(i, 0 | 0b10000000);
-					}
-					else
-					{
-						write_digit(i, 0);
+						tmp = reg;
 					}
 				}
+				if (rf == C_CH455_I_DWN)
+				{
+					tmp -= 1u;
+					if (reg < tmp)
+					{ 
+						tmp = reg;
+					}
+				}
+				if (rf == C_CH455_I_LFT)
+				{ 
+					tmp -= 100u;
+					if (reg < tmp)
+					{ 
+						tmp = reg;
+					}
+				}
+				if (rf == C_CH455_I_RHT)
+				{
+					tmp += 100u;
+					if (tmp > 9999u || reg > tmp)
+					{
+						tmp = reg;
+					}
+				}
+				reg = tmp;
+			}
+			
+			last_r = r;
+
+			for (u8 i = 3u; i <= 3u; i--)
+			{
+				write_digit(i, char_lut_fun(tmp % 10));
+				tmp /= 10;
 			}
 		}
 
