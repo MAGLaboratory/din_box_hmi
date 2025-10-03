@@ -239,7 +239,7 @@ int main(void)
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
 
 	//printf("IIC Host mode\r\n");
-	IIC_Init(40000, C_CH455_ADDR_SP);
+	IIC_Init(100000, C_CH455_ADDR_SP);
 
 	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)
@@ -262,7 +262,7 @@ int main(void)
 			if (i & C_CH455_I_KP)
 			{
 				write_digit(0, char_lut_fun(0));
-				write_digit(1, char_lut_fun(0));
+				write_digit(1, 0b01110110);
 				write_digit(2, char_lut_fun(i >> 4U));
 				write_digit(3, char_lut_fun(i & 0xF));
 				
@@ -271,7 +271,14 @@ int main(void)
 			{
 				for (i = 0; i < 4u; i++)
 				{
-					write_digit(i, 0 | 0b1000000);
+					if ((t1_count >> 12 & 3u) == i)
+					{
+						write_digit(i, 0 | 0b10000000);
+					}
+					else
+					{
+						write_digit(i, 0);
+					}
 				}
 			}
 		}
