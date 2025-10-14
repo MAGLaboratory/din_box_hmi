@@ -1,0 +1,3 @@
+[submodule "PetitModbus"]
+	path = PetitModbus
+	url = https://github.com/MAGLaboratory/PetitModbus.git

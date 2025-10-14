@@ -123,6 +123,11 @@ SECTIONS
       PROVIDE(_data_lma = .);
     } >FLASH AT>FLASH
 
+    CRCTBL 0x0003E00:
+    {
+      KEEP(*(CRCTBL));
+    }
+
     .data :
     {
       . = ALIGN(4);

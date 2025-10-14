@@ -37,6 +37,7 @@
 #include "debug.h"
 #include "init.h"
 #include "consts.h"
+#include <PetitModbus.h>
 
 /* Constants */
 
@@ -61,6 +62,7 @@ const u8 char_lut[] __attribute__((section(".text.consts")))=
 volatile u32 t1_count = 0;
 u32 last_t1_count = 0;
 u8 loop_overrun = 0;
+T_PETIT_MODBUS Petit;
 
 /*********************************************************************
  * @fn      IIC_TX
@@ -216,6 +218,15 @@ void write_digit(u8 digit, u8 chd)
 	IIC_TX(addr, chd);
 }
 
+void PetitUserTxBegin(void)
+{
+	// output the first octet
+	pu8_t tmp;
+	PetitTxBufferPop(&Petit, &tmp);
+	USART1->DATAR = tmp;
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+}
+
 /*********************************************************************
  * @fn      main
  *
@@ -225,7 +236,7 @@ void write_digit(u8 digit, u8 chd)
  */
 int main(void)
 {
-	u16 reg = 500;
+	u16 reg = 500u;
 	SystemCoreClockUpdate();
 
 	APP_GPIO_Init();
@@ -234,12 +245,14 @@ int main(void)
 
 	UART_Init();
 
+	Petit_Init(&Petit);
+
 	// start time
 	TIM_Cmd(TIM1, ENABLE);
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
 
 	//printf("IIC Host mode\r\n");
-	IIC_Init(100000, C_CH455_ADDR_SP);
+	IIC_Init(100000u, C_CH455_ADDR_SP);
 
 	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)

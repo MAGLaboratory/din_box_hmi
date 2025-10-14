@@ -10,6 +10,7 @@
 * microcontroller manufactured by Nanjing Qinheng Microelectronics.
 *******************************************************************************/
 #include <ch32v00x_it.h>
+#include <PetitModbusPort.h>
 
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
@@ -43,10 +44,42 @@ void HardFault_Handler(void)
   }
 }
 
+/*
+ * timer 1 IRQ handler for the system ticking
+ */
+
 void TIM1_UP_IRQHandler(void)
 {
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
     t1_count += 1U;
 }
 
-
+void USART_IRQHandler(void)
+{
+	pu8_t tmp;
+	if (USART_GetITStatus(USART1, USART_IT_TXE) == SET)
+	{
+		// disable the interrupt or add more data
+		if (PetitTxBufferPop(&Petit, &tmp) != 0u)
+		{
+			USART1->DATAR = tmp;
+		}
+		else
+		{
+			// let the hardware complete sending if there is no more data
+			// but disable this interrupt so it does not fire again
+			USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+		}
+	}
+	if (USART_GetITStatus(USART1, USART_IT_TC) == SET)
+	{
+		// transmission complete
+		USART_ClearITPendingBit(USART1, USART_IT_TC);
+		PetitPortDirRx();
+	}
+	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
+	{
+		// only cleared by reading from the receive data register
+		PetitRxBufferInsert(&Petit, USART1->DATAR);
+	}
+}
