@@ -218,13 +218,22 @@ void write_digit(u8 digit, u8 chd)
 	IIC_TX(addr, chd);
 }
 
-void PetitUserTxBegin(void)
+void PetitUserTxBegin(pu8_t data)
 {
 	// output the first octet
-	pu8_t tmp;
-	PetitTxBufferPop(&Petit, &tmp);
-	USART1->DATAR = tmp;
+	USART1->DATAR = data;
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+}
+
+void PetitUserTimerStart(void)
+{
+	modbus_arm = true;
+	modbus_timer = t1_count;
+}
+
+void PetitUserTimerStop(void)
+{
+	modbus_arm = false;
 }
 
 /*********************************************************************
@@ -236,7 +245,7 @@ void PetitUserTxBegin(void)
  */
 int main(void)
 {
-	u16 reg = 500u;
+	u8 cur_disp[4U] = 0U;
 	SystemCoreClockUpdate();
 
 	APP_GPIO_Init();
@@ -246,6 +255,9 @@ int main(void)
 	UART_Init();
 
 	Petit_Init(&Petit);
+	Petit.Timer_Start = &PetitUserTimerStart;
+	Petit.Timer_Stop = &PetitUserTimerStop;
+	Petit.Tx_Begin = &PetitUserTxBegin;
 
 	// start time
 	TIM_Cmd(TIM1, ENABLE);
@@ -257,6 +269,9 @@ int main(void)
 	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)
 	{
+		u8 next_disp[4U];
+		u8 r = 0;
+
 		// main loop timer overflow
 		if (t1_count - last_t1_count != 0U)
 		{
@@ -269,58 +284,41 @@ int main(void)
 			__WFI();
 		}
 
-		if ((t1_count & (C_SLOWER_CYCLE - 1U)) == (C_SLOWER_CYCLE - 1U))
+		// modbus timer implementation
+		if (modbus_arm == true && (t1_count - modbus_timer == C_MODBUS_CLEAR))
 		{
-			u8 r = 0;
-			u8 rf = 0;
-			static u8 last_r = 0;
-			u16 tmp = reg;
-			IIC_RX(C_CH455_ADDR_I, &r);
-			rf = r & ~C_CH455_I_KP;
-			if (last_r != r && r & C_CH455_I_KP)
-			{
-				if (rf == C_CH455_I_UP)
-				{ 
-					tmp += 1u;
-					if (tmp > 9999u || reg > tmp)
-					{
-						tmp = reg;
-					}
-				}
-				if (rf == C_CH455_I_DWN)
-				{
-					tmp -= 1u;
-					if (reg < tmp)
-					{ 
-						tmp = reg;
-					}
-				}
-				if (rf == C_CH455_I_LFT)
-				{ 
-					tmp -= 100u;
-					if (reg < tmp)
-					{ 
-						tmp = reg;
-					}
-				}
-				if (rf == C_CH455_I_RHT)
-				{
-					tmp += 100u;
-					if (tmp > 9999u || reg > tmp)
-					{
-						tmp = reg;
-					}
-				}
-				reg = tmp;
-			}
-			
-			last_r = r;
+			PetitRxBufferReset(&Petit);
+		}
+		else if (t1_count - modbus_timer > C_MODBUS_CLEAR)
+		{
+			// prevents overflow
+			modbus_timer++;
+		}
 
-			for (u8 i = 3u; i <= 3u; i--)
+		// read keypresses every 4ms
+
+		// process modbus
+		PETIT_MODBUS_Process(&Petit);
+
+		next_disp[0U] = PetitRegisters[0U] >> 8U;
+		next_disp[1U] = PetitRegisters[0U] & ((1U << 8U) - 1U);
+		next_disp[2U] = PetitRegisters[1U] >> 8U;
+		next_disp[3U] = PetitRegisters[1U] & ((1U << 8U) - 1U);
+
+		for(u8 i = 0; i < 4U; i++)
+		{
+			if ((t1_count & ((1U << 12U) - 1U)) == (i << 10U) 
+					|| next_disp[i] == cur_disp[i])
 			{
-				write_digit(i, char_lut_fun(tmp % 10));
-				tmp /= 10;
+				write_digit(i, next_disp[i]);
+				cur_disp[i] = next_disp[i];
 			}
+		}
+
+		if ((t1_count & ((1U << 4U) - 1U)) == ((1U << 4U) - 1U))
+		{
+			IIC_RX(C_CH455_ADDR_I, &r);
+			PetitInputRegisters[0U] = r;
 		}
 
 		// increment by one to indicate one execution cycle
