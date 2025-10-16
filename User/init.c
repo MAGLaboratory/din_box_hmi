@@ -124,6 +124,7 @@ void APP_GPIO_Init(void)
 	//
 	// Pin 7: OUT (PC4)
 	// TODO: PWM?
+	// Pin 7 is on T1CH4
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;

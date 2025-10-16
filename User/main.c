@@ -269,7 +269,6 @@ int main(void)
 	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)
 	{
-		u8 next_disp[4U];
 		u8 r = 0;
 
 		// main loop timer overflow
@@ -300,26 +299,33 @@ int main(void)
 		// process modbus
 		PETIT_MODBUS_Process(&Petit);
 
-		next_disp[0U] = PetitRegisters[0U] >> 8U;
-		next_disp[1U] = PetitRegisters[0U] & ((1U << 8U) - 1U);
-		next_disp[2U] = PetitRegisters[1U] >> 8U;
-		next_disp[3U] = PetitRegisters[1U] & ((1U << 8U) - 1U);
-
 		for(u8 i = 0; i < 4U; i++)
 		{
+			// find out what to display (encoded in 7-segment)
+			u8 disp = i & 0x1 ? PetitRegisters[i >> 1u] & ((1 << 8U) - 1U)
+					: PetitRegisters[i >> 1u] >> 8U;
+			// the display is updated on two conditions
+			// the "clock" hits the display digit once a second
+			// the requested display does not match what is currently displayed
 			if ((t1_count & ((1U << 12U) - 1U)) == (i << 10U) 
-					|| next_disp[i] == cur_disp[i])
+					|| disp == cur_disp[i])
 			{
-				write_digit(i, next_disp[i]);
-				cur_disp[i] = next_disp[i];
+				write_digit(i, disp);
+				cur_disp[i] = disp;
 			}
 		}
 
+		// get the key input every 4ms
 		if ((t1_count & ((1U << 4U) - 1U)) == ((1U << 4U) - 1U))
 		{
 			IIC_RX(C_CH455_ADDR_I, &r);
 			PetitInputRegisters[0U] = r;
 		}
+
+		// coil output
+		// the upper 16 bits are for bit clear
+		// the lower 16 are for bit setting
+		GPIOC->BSRR = PetitCoils & 0x1 ? GPIO_Pin_4 : GPIO_Pin_4 << 16U;
 
 		// increment by one to indicate one execution cycle
 		last_t1_count += 1U;
