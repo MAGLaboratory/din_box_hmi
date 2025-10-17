@@ -236,6 +236,7 @@ void PetitUserTxBegin(pu8_t data)
 	// output the first octet
 	USART1->DATAR = data;
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
 }
 
 void PetitPortTimerStart(void)
@@ -277,12 +278,13 @@ int main(void)
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
 
 	//printf("IIC Host mode\r\n");
-	IIC_Init(100000u, C_CH455_ADDR_SP);
+	IIC_Init(400000u, C_CH455_ADDR_SP);
 
 	IIC_TX(C_CH455_ADDR_SP, C_MY_CH455_SP);
 	while (1U)
 	{
 		u8 r = 0;
+		u8 iic_act = false;
 
 		// main loop timer overflow
 		if (t1_count - last_t1_count != 0U)
@@ -296,25 +298,37 @@ int main(void)
 			__WFI();
 		}
 
+		// read keypresses every 4ms
+		// get the key input every 4ms
+		if ((t1_count & ((1U << 5U) - 1U)) == ((1U << 5U) - 1U))
+		{
+			IIC_RX(C_CH455_ADDR_I, &r);
+			PetitInputRegisters[0U] = r;
+			iic_act = true;
+		}
+
 		// modbus timer implementation
-		if (modbus_arm == true && (t1_count - modbus_timer >= C_MODBUS_CLEAR))
+		if (modbus_arm == true && ((t1_count - modbus_timer) >= C_MODBUS_CLEAR))
 		{
 			PetitRxBufferReset(&Petit);
 			modbus_arm = false;
 		}
-		else if (t1_count - modbus_timer > C_MODBUS_CLEAR)
+		else if ((t1_count - modbus_timer) > C_MODBUS_CLEAR)
 		{
 			// prevents overflow
 			modbus_timer++;
 		}
 
-		// read keypresses every 4ms
-
+		
 		// process modbus
 		PETIT_MODBUS_Process(&Petit);
 
 		for(u8 i = 0; i < 4U; i++)
 		{
+			if (iic_act == true)
+			{
+				break;
+			}
 			// find out what to display (encoded in 7-segment)
 			u8 disp = i & 0x1 ? PetitRegisters[i >> 1u] & ((1 << 8U) - 1U)
 					: PetitRegisters[i >> 1u] >> 8U;
@@ -322,18 +336,12 @@ int main(void)
 			// the "clock" hits the display digit once a second
 			// the requested display does not match what is currently displayed
 			if ((t1_count & ((1U << 12U) - 1U)) == (i << 10U) 
-					|| disp == cur_disp[i])
+					|| disp != cur_disp[i])
 			{
 				write_digit(i, disp);
+				iic_act = true;
 				cur_disp[i] = disp;
 			}
-		}
-
-		// get the key input every 4ms
-		if ((t1_count & ((1U << 4U) - 1U)) == ((1U << 4U) - 1U))
-		{
-			IIC_RX(C_CH455_ADDR_I, &r);
-			PetitInputRegisters[0U] = r;
 		}
 
 		// coil output

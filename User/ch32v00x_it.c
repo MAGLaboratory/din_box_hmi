@@ -18,7 +18,7 @@ extern T_PETIT_MODBUS Petit;
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM1_UP_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void USART1_IRQHandler(void) __attribute__((interrput("WCH-Interrupt-fast")));
+void USART1_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
 /*********************************************************************
  * @fn      NMI_Handler
@@ -58,6 +58,9 @@ void TIM1_UP_IRQHandler(void)
     t1_count += 1U;
 }
 
+/*
+ * USART1_IRQHandler
+ */
 void USART1_IRQHandler(void)
 {
 	pu8_t tmp;
@@ -83,7 +86,9 @@ void USART1_IRQHandler(void)
 	}
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{
+		tmp = USART1->DATAR;
 		// only cleared by reading from the receive data register
-		PetitRxBufferInsert(&Petit, USART1->DATAR);
+		PetitRxBufferInsert(&Petit, tmp);
+		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 }
