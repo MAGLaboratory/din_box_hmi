@@ -10,11 +10,15 @@
 * microcontroller manufactured by Nanjing Qinheng Microelectronics.
 *******************************************************************************/
 #include <ch32v00x_it.h>
+#include <PetitModbus.h>
 #include <PetitModbusPort.h>
+
+extern T_PETIT_MODBUS Petit;
 
 void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void TIM1_UP_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void USART1_IRQHandler(void) __attribute__((interrput("WCH-Interrupt-fast")));
 
 /*********************************************************************
  * @fn      NMI_Handler
@@ -54,7 +58,7 @@ void TIM1_UP_IRQHandler(void)
     t1_count += 1U;
 }
 
-void USART_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
 	pu8_t tmp;
 	if (USART_GetITStatus(USART1, USART_IT_TXE) == SET)

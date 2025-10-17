@@ -63,6 +63,8 @@ volatile u32 t1_count = 0;
 u32 last_t1_count = 0;
 u8 loop_overrun = 0;
 T_PETIT_MODBUS Petit;
+u8 modbus_arm = false;
+u32 modbus_timer;
 
 /*********************************************************************
  * @fn      IIC_TX
@@ -218,20 +220,31 @@ void write_digit(u8 digit, u8 chd)
 	IIC_TX(addr, chd);
 }
 
+void PetitPortDirTx(void)
+{
+	GPIOA->BSHR = GPIO_Pin_2;
+}
+
+void PetitPortDirRx(void)
+{
+	GPIOA->BSHR = GPIO_Pin_2 << 16U;
+}
+
 void PetitUserTxBegin(pu8_t data)
 {
+	PetitPortDirTx();
 	// output the first octet
 	USART1->DATAR = data;
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 }
 
-void PetitUserTimerStart(void)
+void PetitPortTimerStart(void)
 {
 	modbus_arm = true;
 	modbus_timer = t1_count;
 }
 
-void PetitUserTimerStop(void)
+void PetitPortTimerStop(void)
 {
 	modbus_arm = false;
 }
@@ -245,7 +258,7 @@ void PetitUserTimerStop(void)
  */
 int main(void)
 {
-	u8 cur_disp[4U] = 0U;
+	u8 cur_disp[4U];
 	SystemCoreClockUpdate();
 
 	APP_GPIO_Init();
@@ -254,9 +267,9 @@ int main(void)
 
 	UART_Init();
 
-	Petit_Init(&Petit);
-	Petit.Timer_Start = &PetitUserTimerStart;
-	Petit.Timer_Stop = &PetitUserTimerStop;
+	PETIT_MODBUS_Init(&Petit);
+	Petit.Timer_Start = &PetitPortTimerStart;
+	Petit.Timer_Stop = &PetitPortTimerStop;
 	Petit.Tx_Begin = &PetitUserTxBegin;
 
 	// start time
@@ -284,9 +297,10 @@ int main(void)
 		}
 
 		// modbus timer implementation
-		if (modbus_arm == true && (t1_count - modbus_timer == C_MODBUS_CLEAR))
+		if (modbus_arm == true && (t1_count - modbus_timer >= C_MODBUS_CLEAR))
 		{
 			PetitRxBufferReset(&Petit);
+			modbus_arm = false;
 		}
 		else if (t1_count - modbus_timer > C_MODBUS_CLEAR)
 		{
@@ -325,7 +339,7 @@ int main(void)
 		// coil output
 		// the upper 16 bits are for bit clear
 		// the lower 16 are for bit setting
-		GPIOC->BSRR = PetitCoils & 0x1 ? GPIO_Pin_4 : GPIO_Pin_4 << 16U;
+		GPIOC->BSHR = PetitCoils[0U] & 0x1U ? GPIO_Pin_4 : GPIO_Pin_4 << 16U;
 
 		// increment by one to indicate one execution cycle
 		last_t1_count += 1U;

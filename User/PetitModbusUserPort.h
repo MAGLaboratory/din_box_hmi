@@ -10,9 +10,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "em_device.h"
-#include "em_usart.h"
-#include "ModbusMiddleWare.h"
 
 #define PETITMODBUS_SLAVE_ADDRESS                       ( 2 )
 
