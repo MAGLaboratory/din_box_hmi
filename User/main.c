@@ -63,8 +63,8 @@ volatile u32 t1_count = 0;
 u32 last_t1_count = 0;
 u8 loop_overrun = 0;
 T_PETIT_MODBUS Petit;
-u8 modbus_arm = false;
-u32 modbus_timer;
+volatile u8 modbus_arm = false;
+volatile u32 modbus_timer;
 
 /*********************************************************************
  * @fn      IIC_TX
@@ -239,13 +239,13 @@ void PetitUserTxBegin(pu8_t data)
 	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
 }
 
-void PetitPortTimerStart(void)
+void PetitT15TimerStart(void)
 {
 	modbus_arm = true;
-	modbus_timer = t1_count;
+	modbus_timer = 0U;
 }
 
-void PetitPortTimerStop(void)
+void PetitT15TimerStop(void)
 {
 	modbus_arm = false;
 }
@@ -269,8 +269,8 @@ int main(void)
 	UART_Init();
 
 	PETIT_MODBUS_Init(&Petit);
-	Petit.Timer_Start = &PetitPortTimerStart;
-	Petit.Timer_Stop = &PetitPortTimerStop;
+	Petit.Timer_Start = &PetitT15TimerStart;
+	Petit.Timer_Stop = &PetitT15TimerStop;
 	Petit.Tx_Begin = &PetitUserTxBegin;
 
 	// start time
@@ -306,19 +306,6 @@ int main(void)
 			PetitInputRegisters[0U] = r;
 			iic_act = true;
 		}
-
-		// modbus timer implementation
-		if (modbus_arm == true && ((t1_count - modbus_timer) >= C_MODBUS_CLEAR))
-		{
-			PetitRxBufferReset(&Petit);
-			modbus_arm = false;
-		}
-		else if ((t1_count - modbus_timer) > C_MODBUS_CLEAR)
-		{
-			// prevents overflow
-			modbus_timer++;
-		}
-
 		
 		// process modbus
 		PETIT_MODBUS_Process(&Petit);

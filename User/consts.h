@@ -30,4 +30,4 @@
 #define C_SLOWER_CYCLE (4U)
 
 // modbus timer constants 
-#define C_MODBUS_CLEAR (3U)
+#define C_MODBUS_CLEAR (4U)

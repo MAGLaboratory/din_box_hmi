@@ -56,6 +56,15 @@ void TIM1_UP_IRQHandler(void)
 {
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
     t1_count += 1U;
+	// modbus timer implementation
+	modbus_timer += 1U;
+	if (modbus_arm == true 
+			&& modbus_timer >= C_MODBUS_CLEAR
+			&& USART_GetFlagStatus(USART1, USART_FLAG_IDLE) == SET)
+	{
+		PetitRxBufferReset(&Petit);
+		modbus_arm = false;
+	}
 }
 
 /*
@@ -82,7 +91,10 @@ void USART1_IRQHandler(void)
 	{
 		// transmission complete
 		USART_ClearITPendingBit(USART1, USART_IT_TC);
-		PetitPortDirRx();
+		if (Petit.Xmit_State == E_PETIT_RXTX_RX)
+		{
+			PetitPortDirRx();
+		}
 	}
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{

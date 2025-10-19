@@ -13,8 +13,11 @@
 #define __CH32V00x_IT_H
 
 #include "debug.h"
+#include "consts.h"
 
 extern volatile u32 t1_count;
+extern volatile u8 modbus_arm;
+extern volatile u32 modbus_timer;
 
 #endif /* __CH32V00x_IT_H */
 
