@@ -236,7 +236,6 @@ void PetitUserTxBegin(pu8_t data)
 	// output the first octet
 	USART1->DATAR = data;
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
 }
 
 void PetitT15TimerStart(void)

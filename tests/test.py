@@ -8,6 +8,8 @@ instr.debug = 1
 
 print(instr.read_register(0x00, functioncode=4))
 
+instr.read_register(0x00)
+
 instr.write_registers(0, [0x065b, 0x4f66]);
 
 instr.write_bit(0, 0)

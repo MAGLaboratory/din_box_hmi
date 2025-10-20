@@ -15,7 +15,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 # settings
 testing_count = 1000
-progress = 1
+progress = 2
 pnt_time = True
 pnt_except = True
 sleep_wait = 0.0
@@ -23,7 +23,7 @@ sleep_wait = 0.0
 timeout_list = []
 #timeout_list = [0.10, 0.11, 0.12]
 
-for i in range(3):
+for i in range(1):
     timeout_list.append(i * 0.001 + 0.018)
 
 

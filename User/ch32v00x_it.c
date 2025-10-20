@@ -85,16 +85,15 @@ void USART1_IRQHandler(void)
 			// let the hardware complete sending if there is no more data
 			// but disable this interrupt so it does not fire again
 			USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+			USART_ITConfig(USART1, USART_IT_TC, ENABLE);
 		}
 	}
 	if (USART_GetITStatus(USART1, USART_IT_TC) == SET)
 	{
 		// transmission complete
 		USART_ClearITPendingBit(USART1, USART_IT_TC);
-		if (Petit.Xmit_State == E_PETIT_RXTX_RX)
-		{
-			PetitPortDirRx();
-		}
+		PetitPortDirRx();
+		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
 	}
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{
