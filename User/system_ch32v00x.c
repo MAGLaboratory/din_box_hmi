@@ -79,7 +79,7 @@ void SystemInit (void)
   RCC->CFGR0 &= (uint32_t)0xFFFEFFFF;
   RCC->INTR = 0x009F0000;
 
-  RCC_AdjustHSICalibrationValue(0x10);
+  RCC_AdjustHSICalibrationValue(0x14);
 
   SetSysClock();
 }

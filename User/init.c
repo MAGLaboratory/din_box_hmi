@@ -86,8 +86,9 @@ void UART_Init(void)
 
 	USART_HalfDuplexCmd(USART1, ENABLE);
 
-	// only RX interrupt for now
+	// interrputs
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
 
 	NVIC_EnableIRQ(USART1_IRQn);
 }

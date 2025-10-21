@@ -57,10 +57,9 @@ void TIM1_UP_IRQHandler(void)
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
     t1_count += 1U;
 	// modbus timer implementation
-	modbus_timer += 1U;
 	if (modbus_arm == true 
-			&& modbus_timer >= C_MODBUS_CLEAR
-			&& USART_GetFlagStatus(USART1, USART_FLAG_IDLE) == SET)
+			&& (t1_count - modbus_timer) >= C_MODBUS_CLEAR)
+
 	{
 		PetitRxBufferReset(&Petit);
 		modbus_arm = false;
@@ -75,6 +74,11 @@ void USART1_IRQHandler(void)
 	pu8_t tmp;
 	if (USART_GetITStatus(USART1, USART_IT_TXE) == SET)
 	{
+	}
+	if (USART_GetITStatus(USART1, USART_IT_TC) == SET)
+	{
+		// clear bit
+		USART_ClearITPendingBit(USART1, USART_IT_TC);
 		// disable the interrupt or add more data
 		if (PetitTxBufferPop(&Petit, &tmp) != 0u)
 		{
@@ -82,18 +86,8 @@ void USART1_IRQHandler(void)
 		}
 		else
 		{
-			// let the hardware complete sending if there is no more data
-			// but disable this interrupt so it does not fire again
-			USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-			USART_ITConfig(USART1, USART_IT_TC, ENABLE);
+			PetitPortDirRx();
 		}
-	}
-	if (USART_GetITStatus(USART1, USART_IT_TC) == SET)
-	{
-		// transmission complete
-		USART_ClearITPendingBit(USART1, USART_IT_TC);
-		PetitPortDirRx();
-		USART_ITConfig(USART1, USART_IT_TC, DISABLE);
 	}
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{

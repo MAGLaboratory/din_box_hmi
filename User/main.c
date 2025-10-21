@@ -235,13 +235,12 @@ void PetitUserTxBegin(pu8_t data)
 	PetitPortDirTx();
 	// output the first octet
 	USART1->DATAR = data;
-	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 }
 
 void PetitT15TimerStart(void)
 {
 	modbus_arm = true;
-	modbus_timer = 0U;
+	modbus_timer = t1_count;
 }
 
 void PetitT15TimerStop(void)
