@@ -31,3 +31,16 @@
 
 // modbus timer constants 
 #define C_MODBUS_CLEAR (4U)
+
+// breakout board
+#define BOB = 1
+// PCB
+//#define HMI_PCB = 1
+
+#if defined(BOB) && defined(HMI_PCB)
+#error "Only one board is supposed to be defined"
+#endif // BOB && HMI_PCB
+
+#if !defined(BOB) && !defined(HMI_PCB)
+#error "At least one board type must be defined"
+#endif

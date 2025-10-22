@@ -5,11 +5,14 @@
  *      Author: brandon
  */
 #include "init.h"
+#include "consts.h"
 
 /*********************************************************************
  * @fn      IIC_Init
  *
  * @brief   Initializes the IIC peripheral.
+ *
+ * Pins PC1, PC2 are initialized here
  *
  * @return  none
  */
@@ -51,6 +54,10 @@ void IIC_Init(u32 bound, u16 address)
  *
  * @brief   Initializes the UART peripheral
  *
+ * Under HMI_PCB, pin PD6 is initialized here
+ *
+ * Under BOB, pin PD5 and PD6 are initialized here
+ *
  * @return  none
  */
 void UART_Init(void)
@@ -63,6 +70,7 @@ void UART_Init(void)
 		RCC_APB2Periph_GPIOD |
 		RCC_APB2Periph_AFIO, ENABLE);
 
+#if defined(HMI_PCB)
 	// pin 1 with PD6 is used as the UART half-duplex pin
 	// this pin is high by default.
 	GPIOD->BSHR = GPIO_Pin_6;
@@ -72,6 +80,21 @@ void UART_Init(void)
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 	GPIO_PinRemapConfig(GPIO_PartialRemap2_USART1, ENABLE);
+#endif //HMI PCB
+
+#if defined(BOB)
+	// Pin 2 PD5
+	GPIOD->BSHR = GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	// Pin 3 PD6
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+#endif // BOB
 
 	USART_InitStructure.USART_BaudRate = 38400;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
@@ -84,8 +107,9 @@ void UART_Init(void)
 	USART_Init(USART1, &USART_InitStructure);
 	USART_Cmd(USART1, ENABLE);
 
+#if defined(HMI_PCB)
 	USART_HalfDuplexCmd(USART1, ENABLE);
-
+#endif // HMI_PCB
 	// interrputs
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
@@ -105,8 +129,10 @@ void APP_GPIO_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(
 			RCC_APB2Periph_GPIOA |
-			RCC_APB2Periph_GPIOC , ENABLE);
+			RCC_APB2Periph_GPIOC |
+			RCC_APB2Periph_GPIOD, ENABLE);
 
+#if defined(HMI_PCB)
 	// Pin 1 is handled by the UART function
 	
 	// Pin 2 is the VSS pin
@@ -130,6 +156,88 @@ void APP_GPIO_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+#endif // HMI_PCB
+#if defined(BOB)
+	// Pin 1 is DIR (PD4)
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	// Pin 2 is handled by the UART function
+
+	// Pin 3 is handled by the UART function
+
+	// Pin 4 is the reset pin
+
+	// Pin 5 is handled by the oscillator
+
+	// Pin 6 is handled by the oscillator
+
+	// Pin 7 is the VSS pin
+
+	// Pin 8 PD0
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	// Pin 9 is the VDD pin
+
+	// Pin 10 PC0
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 11 is handled in the I2C function
+
+	// Pin 12 is handled in the I2C function
+
+	// Pin 13 PC3
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 14 is PC4 which is used for the relay
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 15 is PC5
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 16 is PC6
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 17 is PC7 
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Pin 18 is SWIO
+
+	// Pin 19 PD2
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	// Pin 20 is PD3
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+#endif // BOB
 }
 
 /*********************************************************************

@@ -222,12 +222,22 @@ void write_digit(u8 digit, u8 chd)
 
 void PetitPortDirTx(void)
 {
+#if defined(HMI_PCB)
 	GPIOA->BSHR = GPIO_Pin_2;
+#endif // HMI_PCB
+#if defined(BOB)
+	GPIOD->BSHR = GPIO_Pin_4;
+#endif // BOB
 }
 
 void PetitPortDirRx(void)
 {
+#if defined(HMI_PCB)
 	GPIOA->BSHR = GPIO_Pin_2 << 16U;
+#endif // HMI_PCB
+#if defined(BOB)
+	GPIOD->BSHR = GPIO_Pin_4 << 16U;
+#endif // BOB
 }
 
 void PetitUserTxBegin(pu8_t data)

@@ -14,7 +14,7 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 # settings
-testing_count = 100000
+testing_count = 200000
 progress = 1
 pnt_time = True
 pnt_except = True

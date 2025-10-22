@@ -72,13 +72,10 @@ void TIM1_UP_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
 	pu8_t tmp;
-	if (USART_GetITStatus(USART1, USART_IT_TXE) == SET)
-	{
-	}
-	if (USART_GetITStatus(USART1, USART_IT_TC) == SET)
+	if (USART1->STATR & USART_STATR_TC)
 	{
 		// clear bit
-		USART_ClearITPendingBit(USART1, USART_IT_TC);
+		USART1->STATR = ~USART_STATR_TC;
 		// disable the interrupt or add more data
 		if (PetitTxBufferPop(&Petit, &tmp) != 0u)
 		{
@@ -89,11 +86,10 @@ void USART1_IRQHandler(void)
 			PetitPortDirRx();
 		}
 	}
-	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
+	if (USART1->STATR & USART_STATR_RXNE)
 	{
+		// cleared by reading from the receive data register
 		tmp = USART1->DATAR;
-		// only cleared by reading from the receive data register
 		PetitRxBufferInsert(&Petit, tmp);
-		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 }
