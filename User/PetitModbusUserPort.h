@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "consts.h"
 
 #define PETITMODBUS_SLAVE_ADDRESS                       ( 2 )
 

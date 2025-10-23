@@ -54,6 +54,7 @@ void HardFault_Handler(void)
 
 void TIM1_UP_IRQHandler(void)
 {
+	M_T1_START();
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
     t1_count += 1U;
 	// modbus timer implementation
@@ -64,6 +65,8 @@ void TIM1_UP_IRQHandler(void)
 		PetitRxBufferReset(&Petit);
 		modbus_arm = false;
 	}
+	M_T1_END();
+	return;
 }
 
 /*
@@ -71,6 +74,7 @@ void TIM1_UP_IRQHandler(void)
  */
 void USART1_IRQHandler(void)
 {
+	M_USART_START();
 	pu8_t tmp;
 	if (USART1->STATR & USART_STATR_TC)
 	{
@@ -88,8 +92,10 @@ void USART1_IRQHandler(void)
 	}
 	if (USART1->STATR & USART_STATR_RXNE)
 	{
-		// cleared by reading from the receive data register
+		USART1->STATR = ~USART_STATR_RXNE;
 		tmp = USART1->DATAR;
 		PetitRxBufferInsert(&Petit, tmp);
 	}
+	M_USART_END();
+	return;
 }

@@ -277,5 +277,6 @@ void TIME_Init(void)
 	// configure interrupts
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);
 	TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);
+	NVIC_SetPriority(TIM1_UP_IRQn, NVIC_PriorityGroup_1);
 	NVIC_EnableIRQ(TIM1_UP_IRQn);
 }

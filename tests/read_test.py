@@ -14,7 +14,7 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 # settings
-testing_count = 200000
+testing_count = 300000
 progress = 1
 pnt_time = True
 pnt_except = True
@@ -47,6 +47,7 @@ for target_timeout in timeout_list:
     # while (not p_exit):
     if pnt_time:
         start_time = datetime.datetime.now()
+        p_i = 0
     for i in range(testing_count):
         try:
             dummy = instr.read_registers(0x00, 1)
@@ -55,11 +56,13 @@ for target_timeout in timeout_list:
             if progress == 1:
                 bar.next()
             if progress == 2:
+                p_i += 1
                 print(".", end = '', flush=True)
         except IOError as err:
             if progress == 1:
                 bar.next()
-            if progress == 2:
+            if progress >= 2:
+                p_i += 1
                 print("x", end = '', flush=True)
             if e_counter < 10:
                 errors += str(err)
@@ -69,7 +72,7 @@ for target_timeout in timeout_list:
             if c_co > cons:
                 cons = c_co
             fail += 1
-        if progress == 2 and (i % 80 == 79):
+        if progress >= 2 and (p_i % 80 == 79):
             print("")
         if sleep_wait > 0.0:
             time.sleep(sleep_wait)

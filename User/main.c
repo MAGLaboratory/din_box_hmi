@@ -298,14 +298,16 @@ int main(void)
 		if (t1_count - last_t1_count != 0U)
 		{
 			loop_overrun = 1U;
+			M_LOOP_OVER();
 		}
 
 		// wait
 		while (t1_count - last_t1_count == 0U)
 		{
-			__WFI();
+			// wfi stops the timer from time to time, so do not use it
+			_WFE_();
 		}
-
+		M_MAIN_START();
 		// read keypresses every 4ms
 		// get the key input every 4ms
 		if ((t1_count & ((1U << 5U) - 1U)) == ((1U << 5U) - 1U))
@@ -346,5 +348,6 @@ int main(void)
 
 		// increment by one to indicate one execution cycle
 		last_t1_count += 1U;
+		M_MAIN_END();
 	}
 }
