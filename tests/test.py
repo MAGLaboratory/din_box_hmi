@@ -5,6 +5,7 @@ instr.address = 2
 instr.serial.baudrate = 38400
 instr.serial.timeout = 0.5
 instr.debug = 1
+instr.clear_buffers_before_each_transaction = False
 
 print(instr.read_register(0x00, functioncode=4))
 
