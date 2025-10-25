@@ -305,7 +305,6 @@ int main(void)
 		while (t1_count - last_t1_count == 0U)
 		{
 			// wfi stops the timer from time to time, so do not use it
-			_WFE_();
 		}
 		M_MAIN_START();
 		// read keypresses every 4ms
