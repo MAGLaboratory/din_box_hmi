@@ -21,20 +21,21 @@ testing_count = 2000000
 progress = 4  
 pnt_time = True
 pnt_except = True
+error_sleep_wait = 0.001
 sleep_wait = 0.0
 click_key = Key.f9
-clicked = 0
+clicked = 1 # set to 1 to disable
 
 timeout_list = []
 #timeout_list = [0.10, 0.11, 0.12]
 
 for i in range(3):
-    timeout_list.append(i * 0.001 + 0.017)
+    timeout_list.append(i * 0.001 + 0.016)
 
 for target_timeout in timeout_list:
     succ = 0
     fail = 0
-    c_co = 0
+    c_co = 1 # for resetting the first bit output
     cons = 0
     errors = ""
     e_counter = 0
@@ -58,7 +59,10 @@ for target_timeout in timeout_list:
         p_i = -1
     for i in range(testing_count):
         try:
-            dummy = instr.read_registers(0x00, 1)
+            if c_co == 0:
+                dummy = instr.read_registers(0x00, 1)
+            else:
+                instr.write_bit(0, i > 0)
             c_co = 0
             succ += 1
             if progress == 2 or progress == 5:
@@ -80,6 +84,9 @@ for target_timeout in timeout_list:
                 errors += str(err)
                 errors += "\n"
                 e_counter += 1
+            instr.serial.flush() # sometimes the buffer gets screwy
+            if error_sleep_wait > 0.0:
+                time.sleep(error_sleep_wait)
             c_co += 1
             if c_co > cons:
                 cons = c_co
