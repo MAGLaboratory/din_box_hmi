@@ -245,6 +245,8 @@ void PetitUserTxBegin(pu8_t data)
 	PetitPortDirTx();
 	// output the first octet
 	USART1->DATAR = data;
+	// enable the transmit empty interrupt
+	USART1->CTLR1 |= USART_CTLR1_TXEIE;
 }
 
 void PetitT15TimerStart(void)
@@ -304,7 +306,7 @@ int main(void)
 		// wait
 		while (t1_count - last_t1_count == 0U)
 		{
-			// wfi stops the timer from time to time, so do not use it
+			// wfi stops the t1 system timer from time to time, so do not use it
 		}
 		M_MAIN_START();
 		// read keypresses every 4ms

@@ -80,6 +80,10 @@ void USART1_IRQHandler(void)
 	{
 		// clear bit
 		USART1->STATR = ~USART_STATR_TC;
+		PetitPortDirRx();
+	}
+	if (USART1->STATR & USART_STATR_TXE)
+	{
 		// disable the interrupt or add more data
 		if (PetitTxBufferPop(&Petit, &tmp) != 0u)
 		{
@@ -87,7 +91,8 @@ void USART1_IRQHandler(void)
 		}
 		else
 		{
-			PetitPortDirRx();
+			// disable interrupt
+			USART1->CTLR1 &= ~USART_CTLR1_TXEIE;
 		}
 	}
 	if (USART1->STATR & USART_STATR_RXNE)
