@@ -14,7 +14,7 @@
 
 #define PETITMODBUS_SLAVE_ADDRESS                       ( 2 )
 
-#define PETITMODBUS_DLY_TOP  							( 5UL )
+#define PETITMODBUS_DLY_TOP  							( 6UL )
 
 #define NUMBER_OF_PETITCOILS                            ( 1 )
 #define NUMBER_OF_PETITDISCRETES                        ( 0 )

@@ -247,16 +247,21 @@ void APP_GPIO_Init(void)
  *
  * The system clock should be 4 kHz in order to satisfy the minimum 250 us
  * common denominator from T_1.5 and T_3.5 on modbus.
+ * The system clock would have to be 16 kHz to satisfy the relay PWM drive
+ * requirement.  This would force the timer 1 ISR to divide the call rate by 4
  * {system clock} / {desired fcy} = {scaler}
- * 24e6 / 4e3 = 6 000
+ * 24e6 / 16e3 = 1 500
  * {prescaler} * {period} = {scale}
- * 60 * 100 / 6 000
+ * 15 * 100 / 1 500
  *
+ * Also, 100 is a good period rate for the PWM drive because it will directly
+ * represent a duty cycle percentage.
  * @return  none
  */
 void TIME_Init(void)
 {
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
@@ -266,13 +271,28 @@ void TIME_Init(void)
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInitStructure.TIM_Period = 100U - 1U;
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 60U - 1U;
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 15U - 1U;
 	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0U;
 	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseInitStructure);
 
 	TIM_ARRPreloadConfig(TIM1, ENABLE);
 	TIM_InternalClockConfig(TIM1);
 	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);
+
+	// configure output compare
+	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
+	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIM_OCInitStructure.TIM_Pulse = 0U;
+
+	TIM_OC4Init(TIM1, &TIM_OCInitStructure);
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);
+	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM1->CH4CVR = 0u;
 
 	// configure interrupts
 	TIM_ClearFlag(TIM1, TIM_FLAG_Update);

@@ -54,16 +54,22 @@ void HardFault_Handler(void)
 
 void TIM1_UP_IRQHandler(void)
 {
+	static u8 t1_internal = 0;
 	M_T1_START();
     TIM_ClearFlag(TIM1, TIM_FLAG_Update);
-    t1_count += 1U;
-	// modbus timer implementation
-	if (modbus_arm == true 
-			&& (t1_count - modbus_timer) >= C_MODBUS_CLEAR)
-
+	t1_internal += 1u;
+	if (t1_internal >= 4)
 	{
-		PetitRxBufferReset(&Petit);
-		modbus_arm = false;
+		t1_internal = 0;
+    	t1_count += 1U;
+		// modbus timer implementation
+		if (modbus_arm == true 
+				&& (t1_count - modbus_timer) >= C_MODBUS_CLEAR)
+
+		{
+			PetitRxBufferReset(&Petit);
+			modbus_arm = false;
+		}
 	}
 	M_T1_END();
 	return;
