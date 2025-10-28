@@ -1,4 +1,3 @@
-
 // system parameter bitfield indices
 #define C_CH455_ADDR_SP (0x48)
 #define C_CH455_SP_KOFF (7u)

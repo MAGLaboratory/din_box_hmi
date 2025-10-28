@@ -220,6 +220,86 @@ void write_digit(u8 digit, u8 chd)
 	IIC_TX(addr, chd);
 }
 
+typedef enum
+{
+	eRelaySMOff = 0,
+	eRelaySMOnFull,
+	eRelaySMOnReduced,
+	eRelaySMOnFullReseat
+} T_RELAY_SM_STATE;
+
+
+typedef struct
+{
+	uint32_t cas; /*< count at start */
+	T_RELAY_SM_STATE state;
+} T_RELAY_SM_OUTPUT;
+
+void RelaySM(
+	uint8_t relayOut,
+	uint32_t msCounter,
+	T_RELAY_SM_OUTPUT* out
+)
+{
+	/* Transitions */
+	if (relayOut != 0)
+	{
+		switch (out->state)
+		{
+		case eRelaySMOff:
+			out->state = eRelaySMOnFull;
+			out->cas = msCounter;
+			break;
+		case eRelaySMOnFull:
+			if (msCounter - out->cas >= 800u)
+			{
+				out->state = eRelaySMOnReduced;
+				out->cas = msCounter;
+			}
+			break;
+		case eRelaySMOnReduced:
+			if (msCounter - out->cas >= (40000u-800u))
+			{
+				out->state = eRelaySMOnFullReseat;
+				out->cas = msCounter;
+			}
+			break;
+		case eRelaySMOnFullReseat:
+			if (msCounter - out->cas >= 800u)
+			{
+				out->state = eRelaySMOnReduced;
+				out->cas = msCounter;
+			}
+			break;
+		default:
+			out->state = eRelaySMOff;
+			break;
+		}
+	}
+	else
+	{
+		out->state = eRelaySMOff;
+	}
+
+	/* Output */
+	/* Since there are only two relays and the compare channel is inverted,
+	 * we can calculate the channel number by XORing the 0th bit.
+	 */
+	switch (out->state)
+	{
+	case eRelaySMOff:
+		TIM1->CH4CVR = 0u;
+		break;
+	case eRelaySMOnFullReseat:
+	case eRelaySMOnFull:
+		TIM1->CH4CVR = 100u;
+		break;
+	case eRelaySMOnReduced:
+		TIM1->CH4CVR = 70u;
+		break;
+	}
+}
+
 void PetitPortDirTx(void)
 {
 #if defined(HMI_PCB)
@@ -270,6 +350,7 @@ void PetitT15TimerStop(void)
 int main(void)
 {
 	u8 cur_disp[4U];
+	T_RELAY_SM_OUTPUT srelay;
 	SystemCoreClockUpdate();
 
 	APP_GPIO_Init();
@@ -345,7 +426,7 @@ int main(void)
 		// coil output
 		// the upper 16 bits are for bit clear
 		// the lower 16 are for bit setting
-		GPIOC->BSHR = PetitCoils[0U] & 0x1U ? GPIO_Pin_4 : GPIO_Pin_4 << 16U;
+		RelaySM(PetitCoils[0u], t1_count, &srelay);
 
 		// increment by one to indicate one execution cycle
 		last_t1_count += 1U;
