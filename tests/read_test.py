@@ -17,11 +17,11 @@ signal.signal(signal.SIGTERM, signal_handler)
 keyboard = Controller()
 
 # settings
-testing_count = 2000000
+testing_count = 1000000
 progress = 4  
 pnt_time = True
 pnt_except = True
-error_sleep_wait = 0.001
+error_sleep_wait = 0.01
 sleep_wait = 0.0
 click_key = Key.f9
 clicked = 1 # set to 1 to disable
@@ -29,8 +29,8 @@ clicked = 1 # set to 1 to disable
 timeout_list = []
 #timeout_list = [0.10, 0.11, 0.12]
 
-for i in range(3):
-    timeout_list.append(i * 0.001 + 0.016)
+for i in range(5):
+    timeout_list.append(i * 0.001 + 0.01)
 
 for target_timeout in timeout_list:
     succ = 0
@@ -48,7 +48,7 @@ for target_timeout in timeout_list:
     if sleep_wait > 0.0:
         print("Sleep Wait: " + str(sleep_wait))
     if progress == 1 or progress >= 4:
-        bar = IncrementalBar('Testing', max = testing_count, suffix='%(percent)d%% [%(elapsed_td)s / %(eta)d / %(eta_td)s]')
+        bar = IncrementalBar('Testing', max = testing_count, suffix='%(percent)d%% [%(elapsed_td)s / %(eta_td)s]')
 
     if progress >= 4:
         print("")
@@ -84,7 +84,7 @@ for target_timeout in timeout_list:
                 errors += str(err)
                 errors += "\n"
                 e_counter += 1
-            instr.serial.flush() # sometimes the buffer gets screwy
+            instr.serial.reset_input_buffer() # sometimes the buffer gets screwy
             if error_sleep_wait > 0.0:
                 time.sleep(error_sleep_wait)
             c_co += 1
