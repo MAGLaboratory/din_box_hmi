@@ -32,9 +32,9 @@
 #define C_MODBUS_CLEAR (4U)
 
 // breakout board
-#define BOB = 1
+//#define BOB = 1
 // PCB
-//#define HMI_PCB = 1
+#define HMI_PCB = 1
 
 #if defined(BOB) && defined(HMI_PCB)
 #error "Only one board is supposed to be defined"
