@@ -295,7 +295,7 @@ void RelaySM(
 		TIM1->CH4CVR = 100u;
 		break;
 	case eRelaySMOnReduced:
-		TIM1->CH4CVR = 70u;
+		TIM1->CH4CVR = 85u;
 		break;
 	}
 }
@@ -398,7 +398,7 @@ int main(void)
 			PetitInputRegisters[0U] = r;
 			iic_act = true;
 		}
-		
+
 		// process modbus
 		PETIT_MODBUS_Process(&Petit);
 
@@ -409,6 +409,7 @@ int main(void)
 				break;
 			}
 			// find out what to display (encoded in 7-segment)
+			// two bytes per register so compute which register the byte is in
 			u8 disp = i & 0x1 ? PetitRegisters[i >> 1u] & ((1 << 8U) - 1U)
 					: PetitRegisters[i >> 1u] >> 8U;
 			// the display is updated on two conditions

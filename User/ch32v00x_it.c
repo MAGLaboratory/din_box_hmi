@@ -85,8 +85,11 @@ void USART1_IRQHandler(void)
 	if (USART1->STATR & USART_STATR_TC)
 	{
 		// clear bit
-		USART1->STATR = ~USART_STATR_TC;
-		PetitPortDirRx();
+		USART1->STATR &= ~USART_STATR_TC;
+		if (Petit.Xmit_State == E_PETIT_RXTX_RX)
+		{
+			PetitPortDirRx();
+		}
 	}
 	if (USART1->STATR & USART_STATR_TXE)
 	{

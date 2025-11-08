@@ -112,7 +112,7 @@ void UART_Init(void)
 #endif // HMI_PCB
 	// interrputs
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(USART1, USART_IT_TC, ENABLE);
+	USART1->CTLR1 |= USART_CTLR1_TCIE;
 
 	NVIC_EnableIRQ(USART1_IRQn);
 }
@@ -154,7 +154,7 @@ void APP_GPIO_Init(void)
 	// Pin 7 is on T1CH4
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_30MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 #endif // HMI_PCB
 #if defined(BOB)
