@@ -17,7 +17,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 keyboard = Controller()
 
 # settings
-testing_count = 1000000
+testing_count = 2000000
 progress = 4  
 pnt_time = True
 pnt_except = True
@@ -25,17 +25,21 @@ error_sleep_wait = 0.01
 sleep_wait = 0.0
 click_key = Key.f9
 clicked = 1 # set to 1 to disable
+print_report = 1
 
 timeout_list = []
 #timeout_list = [0.10, 0.11, 0.12]
 
-for i in range(5):
-    timeout_list.append(i * 0.001 + 0.01)
+""" Generate the timeout list """
+for i in range(3):
+    timeout_list.append(i * 0.001 + 0.008)
+
+queued_info = []
 
 for target_timeout in timeout_list:
     succ = 0
     fail = 0
-    c_co = 1 # for resetting the first bit output
+    c_co = 0
     cons = 0
     errors = ""
     e_counter = 0
@@ -44,9 +48,13 @@ for target_timeout in timeout_list:
     instr.serial.baudrate = 38400
     instr.serial.timeout = target_timeout
     instr.clear_buffers_before_each_transaction = False
-    print("Timeout: " + str(instr.serial.timeout))
+    info = f"Timeout: {str(instr.serial.timeout)}"
+    queued_info.append(info)
+    print(info)
     if sleep_wait > 0.0:
-        print("Sleep Wait: " + str(sleep_wait))
+        info = f"Sleep Wait: {str(sleep_wait)}"
+        queue_info.append(info)
+        print(info)
     if progress == 1 or progress >= 4:
         bar = IncrementalBar('Testing', max = testing_count, suffix='%(percent)d%% [%(elapsed_td)s / %(eta_td)s]')
 
@@ -59,7 +67,8 @@ for target_timeout in timeout_list:
         p_i = -1
     for i in range(testing_count):
         try:
-            if c_co == 0:
+            # write the output coil in case of failure
+            if c_co == 0 or i > 0:
                 dummy = instr.read_registers(0x00, 1)
             else:
                 instr.write_bit(0, i > 0)
@@ -84,6 +93,7 @@ for target_timeout in timeout_list:
                 errors += str(err)
                 errors += "\n"
                 e_counter += 1
+            instr.serial.flush()
             instr.serial.reset_input_buffer() # sometimes the buffer gets screwy
             if error_sleep_wait > 0.0:
                 time.sleep(error_sleep_wait)
@@ -100,14 +110,20 @@ for target_timeout in timeout_list:
     
     print()
     if pnt_time:
-        print("Execution time: {}".format(datetime.datetime.now() - start_time))
+        info = "Execution time: {}".format(datetime.datetime.now() - start_time)
+        queued_info.append(info)
+        print(info)
     if progress == 1 or progress >= 4:
         bar.finish()
-    print("Success: " + str(succ), ", Failure: " + str(fail), end='')
-    print(", Consecutive Failures: " + str(cons))
+    info = f"Success: {str(succ)}, Failure: {str(fail)}, Consecutive Failures: {str(cons)}"
+    print(info)
+    queued_info.append(info)
     if pnt_except:
         print("Exceptions encountered:")
         print(errors)
     if p_exit:
         break
-    
+
+if print_report:
+    print("\033[1mFinal Report\033[0m")
+    for info in queued_info: print(info)
