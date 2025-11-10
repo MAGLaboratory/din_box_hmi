@@ -3,7 +3,6 @@
 import minimalmodbus
 import datetime, time, signal
 from progress.bar import IncrementalBar
-from pynput.keyboard import Key, Controller
 
 p_exit = 0
 
@@ -14,7 +13,6 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
-keyboard = Controller()
 
 # settings
 testing_count = 2000000
@@ -23,8 +21,6 @@ pnt_time = True
 pnt_except = True
 error_sleep_wait = 0.01
 sleep_wait = 0.0
-click_key = Key.f9
-clicked = 1 # set to 1 to disable
 print_report = 1
 
 timeout_list = []
@@ -44,7 +40,7 @@ for target_timeout in timeout_list:
     errors = ""
     e_counter = 0
     
-    instr = minimalmodbus.Instrument("COM3", 2)
+    instr = minimalmodbus.Instrument("/dev/ttyUSB0", 2)
     instr.serial.baudrate = 38400
     instr.serial.timeout = target_timeout
     instr.clear_buffers_before_each_transaction = False
@@ -85,10 +81,6 @@ for target_timeout in timeout_list:
                 print("x" if progress == 2 else f"\033[F\033[{p_i%80+1}Gx\n", end = '', flush=True)
             if progress == 1 or progress >= 2:
                 bar.next()
-            if clicked == 0:
-                keyboard.press(click_key)
-                keyboard.release(click_key)
-                clicked = 1
             if e_counter < 10:
                 errors += str(err)
                 errors += "\n"
