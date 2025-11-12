@@ -24,11 +24,11 @@ sleep_wait = 0.0
 print_report = 1
 
 timeout_list = []
-#timeout_list = [0.10, 0.11, 0.12]
+timeout_list = [0.012, 0.013]
 
 """ Generate the timeout list """
-for i in range(3):
-    timeout_list.append(i * 0.001 + 0.008)
+# for i in range(3):
+#     timeout_list.append(i * 0.001 + 0.008)
 
 queued_info = []
 
