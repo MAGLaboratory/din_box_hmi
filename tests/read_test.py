@@ -13,6 +13,21 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
+char_lut = [
+    0x3f, 0x06, 0x5b, 0x4f,
+    0x65, 0x6d, 0x7d, 0x07,
+    0x7f, 0x6f, 0x77, 0x7c,
+    0x39, 0x5e, 0x79, 0x71
+]
+
+def str27seg(s):
+    rv = [0, 0]
+    for i in range(4):
+        try:
+            rv[i // 2] |= char_lut[int(s[3 - i])] << (4 if i % 2 else 1)
+        except Exception:
+            break
+    return rv
 
 # settings
 testing_count = 2000000
@@ -24,7 +39,7 @@ sleep_wait = 0.0
 print_report = 1
 
 timeout_list = []
-timeout_list = [0.012, 0.013]
+timeout_list = [0.013, 0.014]
 
 """ Generate the timeout list """
 # for i in range(3):
@@ -39,6 +54,7 @@ for target_timeout in timeout_list:
     cons = 0
     errors = ""
     e_counter = 0
+    extra_digits = len(str(testing_count)) - len(str(testing_count)[:4])
     
     instr = minimalmodbus.Instrument("/dev/ttyUSB0", 2)
     instr.serial.baudrate = 38400
@@ -61,11 +77,15 @@ for target_timeout in timeout_list:
     if pnt_time:
         start_time = datetime.datetime.now()
         p_i = -1
-    for i in range(testing_count):
+        i = 0
+    while i < testing_count:
+        rem = (testing_count - i - 1) // 10 ** extra_digits
+        rem = str(rem)
+        rem = str27seg(rem)
         try:
             # write the output coil in case of failure
             if c_co == 0 or i > 0:
-                dummy = instr.read_registers(0x00, 1)
+                instr.write_register(i % 2, rem[i % 2])
             else:
                 instr.write_bit(0, i > 0)
             c_co = 0
@@ -97,6 +117,7 @@ for target_timeout in timeout_list:
             print("\n" if progress < 4 else "\033[1G\033[K\n", end='', flush=True)
         if sleep_wait > 0.0:
             time.sleep(sleep_wait)
+        i += 1;
         if p_exit:
             break
     
