@@ -25,7 +25,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 char_lut = [
     0x3f, 0x06, 0x5b, 0x4f,
-    0x65, 0x6d, 0x7d, 0x07,
+    0x66, 0x6d, 0x7d, 0x07,
     0x7f, 0x6f, 0x77, 0x7c,
     0x39, 0x5e, 0x79, 0x71
 ]
@@ -34,13 +34,13 @@ def str27seg(s):
     rv = [0, 0]
     for i in range(4):
         try:
-            rv[i // 2] |= char_lut[int(s[3 - i])] << (4 if i % 2 else 1)
+            rv[i // 2] |= char_lut[int(s[i])] << (0 if i % 2 else 8)
         except Exception:
             break
     return rv
 
 # settings
-testing_count = 200000
+testing_count = 20000
 progress = 4  
 pnt_time = True
 pnt_except = True
@@ -57,7 +57,6 @@ timeout_list = [0.013, 0.014]
 
 queued_info = []
 
-@profile
 def main():
     for target_timeout in timeout_list:
         succ = 0
@@ -67,6 +66,10 @@ def main():
         errors = ""
         e_counter = 0
         extra_digits = len(str(testing_count)) - len(str(testing_count)[:4])
+        p_i = -1
+        i = 0
+        bar_n = 0
+        last_bar = 0
         
         instr = minimalmodbus.Instrument("/dev/ttyUSB0", 2)
         instr.serial.baudrate = 38400
@@ -87,13 +90,16 @@ def main():
             
         # while (not p_exit):
         if pnt_time:
-            start_time = datetime.datetime.now()
-            p_i = -1
-            i = 0
+            start_time = time.monotonic()
+
+        last_rem_t = start_time
+        rem = str27seg(str((testing_count - i - 1) // 10 ** extra_digits))
+        
         while i < testing_count:
-            rem = (testing_count - i - 1) // 10 ** extra_digits
-            rem = str(rem)
-            rem = str27seg(rem)
+            my_time = time.monotonic()
+            if (my_time - last_rem_t >= 0.2 or extra_digits < 2):
+                rem = str27seg(str((testing_count - i - 1) // 10 ** extra_digits))
+                last_rem_t = my_time
             try:
                 # write the output coil in case of failure
                 if c_co == 0 or i > 0:
@@ -106,13 +112,23 @@ def main():
                     p_i += 1
                     print("." if progress == 2 else f"\033[F\033[{p_i%80+1}G.\n", end = '', flush=True)
                 if progress == 1 or progress >= 4:
-                    bar.next()
+                    my_time = time.monotonic()
+                    bar_n += 1
+                    if (my_time - last_bar >= 0.4):
+                        bar.next(bar_n)
+                        bar_n = 0
+                        last_bar = my_time
             except IOError as err:
                 if progress >= 2:
                     p_i += 1
                     print("x" if progress == 2 else f"\033[F\033[{p_i%80+1}Gx\n", end = '', flush=True)
                 if progress == 1 or progress >= 2:
-                    bar.next()
+                    my_time = time.monotonic()
+                    bar_n += 1
+                    if (my_time - last_bar >= 0.4):
+                        bar.next(bar_n)
+                        bar_n = 0
+                        last_bar = my_time
                 if e_counter < 10:
                     errors += str(err)
                     errors += "\n"
@@ -135,7 +151,7 @@ def main():
         
         print()
         if pnt_time:
-            info = "Execution time: {}".format(datetime.datetime.now() - start_time)
+            info = f"Execution time: {time.monotonic() - start_time}"
             queued_info.append(info)
             print(info)
         if progress == 1 or progress >= 4:
