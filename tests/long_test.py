@@ -32,15 +32,18 @@ char_lut = [
 
 def str27seg(s):
     rv = [0, 0]
-    for i in range(4):
+    s = s[::-1]
+    i = 4
+    while i != 0:
+        i -= 1
         try:
-            rv[i // 2] |= char_lut[int(s[i])] << (0 if i % 2 else 8)
+            rv[i // 2] |= char_lut[int(s[3 - i])] << (0 if i % 2 else 8)
         except Exception:
             break
     return rv
 
 # settings
-testing_count = 20000
+testing_count = 1000000
 progress = 4  
 pnt_time = True
 pnt_except = True
@@ -49,11 +52,11 @@ sleep_wait = 0.0
 print_report = 1
 
 timeout_list = []
-timeout_list = [0.013, 0.014]
+#timeout_list = [0.013, 0.014]
 
 """ Generate the timeout list """
-# for i in range(3):
-#     timeout_list.append(i * 0.001 + 0.008)
+for i in range(7):
+    timeout_list.append(i * 0.001 + 0.008)
 
 queued_info = []
 

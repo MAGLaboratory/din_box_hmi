@@ -1,0 +1,1048 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:04 / 0:00:01]
+Execution time: 22985.266061501003
+
+Success: 1999855, Failure: 145, Consecutive Failures: 1
+Exceptions encountered:
+Checksum error in rtu mode: b'\x00\x01' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x01' (plain response: b'\x02\x10\x00\x01')
+Checksum error in rtu mode: b'\x00\x01' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x01' (plain response: b'\x02\x10\x00\x01')
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Checksum error in rtu mode: b'\x00\x01' instead of b'\xc1\x99' . The response is
+: b'\x02\x10\x00\x01\x00\x01' (plain response: b'\x02\x10\x00\x01\x00\x01')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x00\x00' (plain response: b'\x02\x10\x00\x00\x00')
+Too short Modbus RTU response (minimum length 4 bytes). Response: b'\x02\x10'
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x00\x00' (plain response: b'\x02\x10\x00\x00\x00')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+
+Timeout: 0.009000000000000001
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:39 / 0:00:01]
+Execution time: 23020.120733451004
+
+Success: 1999963, Failure: 37, Consecutive Failures: 1
+Exceptions encountered:
+Checksum error in rtu mode: b'\x00\x01' instead of b'\x00Y' . The response is: b
+'\x02\x10\x00\x00\x00\x01' (plain response: b'\x02\x10\x00\x00\x00\x01')
+Checksum error in rtu mode: b'\x00\x01' instead of b'\xc1\x99' . The response is
+: b'\x02\x10\x00\x01\x00\x01' (plain response: b'\x02\x10\x00\x01\x00\x01')
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x00\x00' (plain response: b'\x02\x10\x00\x00\x00')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Checksum error in rtu mode: b'\x01\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x01\x00' (plain response: b'\x02\x10\x00\x01\x00')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+
+Timeout: 0.01
+xxxxxxxxxxxxx
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:05 / 0:00:01]
+Execution time: 22985.916649801
+
+Success: 1999987, Failure: 13, Consecutive Failures: 1
+Exceptions encountered:
+Too short Modbus RTU response (minimum length 4 bytes). Response: b'\x02'
+Checksum error in rtu mode: b'\x00\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x00\x00' (plain response: b'\x02\x10\x00\x00\x00')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x00' (plain response: b'\x02\x10\x00\x00')
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Too short Modbus RTU response (minimum length 4 bytes). Response: b'\x02\x10\x00
+'
+Checksum error in rtu mode: b'\x00\x01' instead of b'\xc1\x99' . The response is
+: b'\x02\x10\x00\x01\x00\x01' (plain response: b'\x02\x10\x00\x01\x00\x01')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x00' (plain response: b'\x02\x10\x00\x00')
+Checksum error in rtu mode: b'\x01\x01' instead of b'Y\x00' . The response is: b
+'\x02\x10\x00\x00\x00\x01\x01' (plain response: b'\x02\x10\x00\x00\x00\x01\x01')
+Checksum error in rtu mode: b'\x01P' instead of b'X\x90' . The response is: b'\x
+02\x10\x00\x01\x00\x01P' (plain response: b'\x02\x10\x00\x01\x00\x01P')
+Checksum error in rtu mode: b'\x00\x01' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x01' (plain response: b'\x02\x10\x00\x01')
+
+Timeout: 0.011
+xxx
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:00 / 0:00:01]
+Execution time: 22981.104836754006
+
+Success: 1999997, Failure: 3, Consecutive Failures: 1
+Exceptions encountered:
+Checksum error in rtu mode: b'\x01\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x01\x00' (plain response: b'\x02\x10\x00\x01\x00')
+Checksum error in rtu mode: b'\x00\x00' instead of b'\x01\x1c' . The response is
+: b'\x02\x10\x00\x00' (plain response: b'\x02\x10\x00\x00')
+Too short Modbus RTU response (minimum length 4 bytes). Response: b'\x02\x10\x00
+'
+
+Timeout: 0.012
+x
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:07 / 0:00:01]
+Execution time: 22987.263347350017
+
+Success: 1999999, Failure: 1, Consecutive Failures: 1
+Exceptions encountered:
+Checksum error in rtu mode: b'\x00\x00' instead of b'\xdd\xc0' . The response is
+: b'\x02\x10\x00\x00\x00' (plain response: b'\x02\x10\x00\x00\x00')
+
+Timeout: 0.013000000000000001
+
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:10 / 0:00:01]
+Execution time: 22991.107197109028
+
+Success: 2000000, Failure: 0, Consecutive Failures: 0
+Exceptions encountered:
+
+Timeout: 0.014
+x
+Testing |ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ| 99% [6:23:05 / 0:00:01]
+Execution time: 22985.840097326
+
+Success: 1999999, Failure: 1, Consecutive Failures: 1
+Exceptions encountered:
+Too short Modbus RTU response (minimum length 4 bytes). Response: b'\x02\x10'
+
+Final Report
+Timeout: 0.008
+Execution time: 22985.266061501003
+Success: 1999855, Failure: 145, Consecutive Failures: 1
+Timeout: 0.009000000000000001
+Execution time: 23020.120733451004
+Success: 1999963, Failure: 37, Consecutive Failures: 1
+Timeout: 0.01
+Execution time: 22985.916649801
+Success: 1999987, Failure: 13, Consecutive Failures: 1
+Timeout: 0.011
+Execution time: 22981.104836754006
+Success: 1999997, Failure: 3, Consecutive Failures: 1
+Timeout: 0.012
+Execution time: 22987.263347350017
+Success: 1999999, Failure: 1, Consecutive Failures: 1
+Timeout: 0.013000000000000001
+Execution time: 22991.107197109028
+Success: 2000000, Failure: 0, Consecutive Failures: 0
+Timeout: 0.014
+Execution time: 22985.840097326
+Success: 1999999, Failure: 1, Consecutive Failures: 1
+Timer unit: 1e-09 s
+
+brandon@rpi-zero:~/din_box_hmi/tests $
