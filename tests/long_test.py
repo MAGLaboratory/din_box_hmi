@@ -3,16 +3,6 @@
 import minimalmodbus
 import datetime, time, signal
 from progress.bar import IncrementalBar
-from line_profiler import LineProfiler
-
-profiler = LineProfiler()
-
-def profile(func):
-    def inner(*args, **kwargs):
-        profiler.add_function(func)
-        profiler.enable_by_count()
-        return func(*args, **kwargs)
-    return inner
 
 p_exit = 0
 
@@ -20,8 +10,7 @@ def signal_handler(sig, frame):
     global p_exit
     p_exit = 1
 
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
+""" Signal Handlers Moved """
 
 char_lut = [
     0x3f, 0x06, 0x5b, 0x4f,
@@ -54,9 +43,7 @@ print_report = 1
 timeout_list = []
 #timeout_list = [0.013, 0.014]
 
-""" Generate the timeout list """
-for i in range(7):
-    timeout_list.append(i * 0.001 + 0.008)
+""" the timeout list is generated somewhere else """
 
 queued_info = []
 
@@ -168,9 +155,15 @@ def main():
         if p_exit:
             break
 
-main()
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    for i in range(7):
+        timeout_list.append(i * 0.001 + 0.008)
 
-if print_report:
-    print("\033[1mFinal Report\033[0m")
-    for info in queued_info: print(info)
-    profiler.print_stats()
+    main()
+
+    if print_report:
+        print("\033[1mFinal Report\033[0m")
+        for info in queued_info: print(info)
