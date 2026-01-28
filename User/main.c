@@ -28,7 +28,6 @@
  *
  * 			  PA1 (1) -- UTX_2
  * 			  PA2 (3) -- Dir
- * 			  (both buttons -> seconds)
  *
  * 			  PC4 (7) -- Relay Output
  *
